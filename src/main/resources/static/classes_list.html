@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/axios.js"></script>
+    <script src="js/vue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <a href="index.html">返回首页</a>
+        <a href="classes_add.html">添加班级</a> <br />
+
+        <table border="1">
+            <tr>
+                <td>编号</td>
+                <td>名称</td>
+                <td>描述</td>
+                <td>操作</td>
+            </tr>
+            <tr v-for="(classes,index) in classesList">
+                <td>{{classes.cid}}</td>
+                <td>{{classes.cname}}</td>
+                <td>{{classes.desc}}</td>
+                <td>
+                    <a :href="'classes_edit.html?id=' + classes.cid">修改</a>
+                    <a v-on:click="edit(v.uuid)">修改</a>
+                    <a href="#" @click="deleteClasses(classes.cid)">删除</a>
+                </td>
+
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            classesList: []
+        },
+        methods: {
+            selectAllClasses() {
+                //ajax查询
+                var url = "http://localhost:8080/classes"
+                axios.get(url)
+                    .then(res => {
+                        //成功
+                        //获得查询结果
+                        var baseResult = res.data
+                        if (baseResult.code == 1) {
+                            //成功
+                            this.classesList = baseResult.data
+                        } else {
+                            //失败
+                            alert(baseResult.message)
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    })
+            },
+            deleteClasses(id) {
+                if (!confirm("您确定要删除么？")) {
+                    return
+                }
+                // 删除
+                var url = `http://localhost:8080/classes/${id}`;
+                axios.delete(url)
+                    .then(response => {
+                        if (response.data.code == 1) {
+                            // 成功提示
+                            alert(response.data.message)
+                            // 跳转
+                            location.href = "classes_list.html"
+                        } else {
+                            alert(response.data.message)
+                        }
+                    })
+                    .catch(error => {
+                        alert(error)
+                    })
+            }
+        },
+        created() {
+            //查询所有
+            this.selectAllClasses()
+        }
+    })
+</script>

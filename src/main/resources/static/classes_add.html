@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="js/vue.js"></script>
+    <script src="js/axios.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <a href="classes_list.html">返回列表页</a>
+    
+        <table border="1">
+            <tr>
+                <td>班级ID</td>
+                <td><input v-model="classes.cid" /> </td>
+            </tr>
+            <tr>
+                <td>班级名称</td>
+                <td><input  v-model="classes.cname" /> </td>
+            </tr>
+            <tr>
+                <td>班级描述</td>
+                <td>
+                    <textarea cols="20" rows="5" v-model="classes.desc" ></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><input type="button" value="添加" @click="addClasses" /></td>
+            </tr>
+    
+        </table>
+    </div>
+</body>
+
+</html>
+<script>
+   new Vue({
+        el: '#app',
+        data: {
+            classes: {},
+        },
+        mounted() {
+            
+        },
+        methods: {
+            addClasses() {
+                var url = `http://localhost:8080/classes`;
+                axios.post(url, this.classes)
+                .then( res => {
+                    if(res.data.code == 1){
+                        // 成功提示
+                        alert(res.data.message)
+                        // 跳转
+                        location.href = "classes_list.html"
+                    } else {
+                        alert(res.data.message)
+                    }
+                })
+                .catch(error => {
+                    alert(error)
+                })
+            }
+        },
+    })
+</script>

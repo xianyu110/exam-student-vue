@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>班级列表</title>
+
+    <script type="text/javascript" src="js/vue.js"></script>
+    <script type="text/javascript" src="js/axios.js"></script>
+
+<body>
+</head>
+<div id="app">
+    <a href="classes_list.html">返回列表页</a>
+
+    <table id="tid" border="1">
+        <tr>
+            <td>班级名称</td>
+            <td>
+                <input v-model="classes.cname" />
+            </td>
+        </tr>
+        <tr>
+            <td>班级描述</td>
+            <td>
+                <textarea cols="20" rows="5" v-model="classes.desc" ></textarea>
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><input type="button" value="更新" /></td>
+        </tr>
+
+    </table>
+</div>
+
+</body>
+</html>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            classes: {},       //学生表单数据
+        },
+        mounted() {
+            // 通过id查询详情
+            this.findById()
+        },
+        methods: {
+            findById() {
+                // 获得id
+                var arr = location.href.split("?id=")
+                var id = arr[1]
+                // 路径
+                var url = `/classes/${id}`;
+
+                axios.get(url)
+                    .then( response => {
+                        if(response.data.code == 1){
+                            this.classes = response.data.data
+                        } else {
+                            alert(response.data.message)
+                        }
+                    })
+                    .catch(error => {
+                        alert(error)
+                    })
+            }
+        },
+    })
+</script>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="js/axios.js"></script>
+    <script src="js/vue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <form>
+            班级 : <select name="cid" v-model="studentVo.cid">
+                <option v-for="(classes,index) in classesList" :value="classes.cid" >{{classes.cname}}</option>
+            </select>
+            姓名 : <input type="text" v-model="studentVo.studentName">
+            年龄 : <input type="text" v-model="studentVo.startAge"> -
+            <input type="text" v-model="studentVo.endAge">
+            <input type="button" value="查询" @click="condition(1)">
+        </form>
+        <table border="1">
+            <tr>
+                <td>ID</td>
+                <td>班级</td>
+                <td>姓名</td>
+                <td>年龄</td>
+                <td>生日</td>
+                <td>性别</td>
+                <td>操作</td>
+            </tr>
+            <tr v-for="(student,index) in pageInfo.list">
+                <td>{{student.sid}} </td>
+                <td>{{student.classes !=null ? student.classes.cname : ''}} </td>
+                <td>{{student.sname}} </td>
+                <td>{{student.age}} </td>
+                <td>{{student.birthday}} </td>
+                <td>{{student.gender == 1 ? "男" : "女"}} </td>
+                <td>
+                    修改
+                    删除
+                </td>
+            </tr>
+        </table>
+
+        <!--分页-->
+        当前第{{pageInfo.pageNum}}页,共{{pageInfo.pages}}页
+        <a href="" v-for="(num,index) in pageInfo.pages" @click.prevent="condition(num)">{{num}} </a>
+
+    </div>
+</body>
+
+</html>
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            pageInfo: { //分页数据
+                pageSize: 2,
+                pageNum: 1
+
+            },
+            studentVo: {
+
+            }
+
+        },
+        methods: {
+            selectAllClasses() {
+                //ajax查询
+                var url = "http://localhost:8080/classes"
+                axios.get(url)
+                    .then(res => {
+                        //成功
+                        //获得查询结果
+                        var baseResult = res.data
+                        if (baseResult.code == 1) {
+                            //成功
+                            this.classesList = baseResult.data
+                        } else {
+                            //失败
+                            alert(baseResult.message)
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    })
+            },
+            condition(pageNum) {
+                if (pageNum) {
+                    this.pageInfo.pageNum = pageNum
+                }
+                var url = `http://localhost:8080/student/condition/${this.pageInfo.pageSize}/${this.pageInfo.pageNum}`
+                axios.post(url, this.studentVo)
+                    .then(res => {
+                        //处理数据
+                        var baseResult = res.data
+
+                        //判断
+                        if (baseResult.code == 1) {
+                            //成功
+                            this.pageInfo = baseResult.data
+                        } else {
+                            //失败
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    })
+            }
+        },
+        created() {
+            //条件查询
+            this.condition()
+            //查询所有
+            this.selectAllClasses()
+        }
+    })
+</script>
